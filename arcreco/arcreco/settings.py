@@ -61,10 +61,10 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:8080',
+    'http://localhost:4200',
 ] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
-    'http://localhost:8080',
+    'http://localhost:4200',
 ]
 
 ROOT_URLCONF = 'arcreco.urls'
@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'arcreco.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'arcreco_test_db',
+        'NAME': 'arcreco_db',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': 'localhost',
@@ -129,7 +129,7 @@ REST_FRAMEWORK = {
 
 # simple jwt token settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=65)
 }
 
 # Internationalization
