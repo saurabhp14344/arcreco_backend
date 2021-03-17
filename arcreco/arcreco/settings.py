@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'core',
     'recon',
+    'contactus',
 ]
 
 MIDDLEWARE = [
@@ -129,7 +130,7 @@ REST_FRAMEWORK = {
 
 # simple jwt token settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=65)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=45)
 }
 
 # Internationalization

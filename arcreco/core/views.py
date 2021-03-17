@@ -76,5 +76,12 @@ class UserLoginApiView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
+class UserProfileView(generics.ListAPIView):
+    """Get a profile view"""
 
+    permission_classes = (IsAuthenticated,)
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
 
+    def get_queryset(self):
+        return UserProfile.objects.filter(id=self.request.user.id)

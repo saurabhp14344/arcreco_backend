@@ -7,10 +7,11 @@ class UserUploadFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.UploadFiles
-        fields = ('id', 'user_profile', 'name', 'file',)
+        fields = ('id', 'user_profile', 'name', 'file', 'type', 'created_date')
         extra_kwargs = {'user_profile': {'read_only': True},
                         'name': {'required': False},
                         'file': {'required': True},
+                        'type': {'required': True},
                         }
 
 
