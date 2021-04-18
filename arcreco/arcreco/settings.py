@@ -130,7 +130,7 @@ REST_FRAMEWORK = {
 
 # simple jwt token settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=45)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=145)
 }
 
 # Internationalization
