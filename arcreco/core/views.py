@@ -55,18 +55,19 @@ class ChangeProfilePictureView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.serializer_class(request.user, data=request.data)
         if serializer.is_valid():
-            file = serializer.validated_data.get('profile_pic')
-            s3_image_path = s3_upload.create_presigned_post(key=file)
-            post_url = s3_image_path['url']
-            data = s3_image_path['fields']
-            response = requests.post(url=post_url, data=data, files={'file': file})
-            upload_to_s3 = 'https://%s.s3.amazonaws.com/%s' % (settings.AWS_STORAGE_BUCKET_NAME, file)
-            serializer.validated_data['profile_pic'] = upload_to_s3
+            # file = serializer.validated_data.get('profile_pic')
+            # s3_image_path = s3_upload.create_presigned_post(key=file)
+            # post_url = s3_image_path['url']
+            # data = s3_image_path['fields']
+            # response = requests.post(url=post_url, data=data, files={'file': file})
+            # upload_to_s3 = 'https://%s.s3.amazonaws.com/%s' % (settings.AWS_STORAGE_BUCKET_NAME, file)
+            # serializer.validated_data['profile_pic'] = upload_to_s3
             serializer.save()
-            return Response({
-                'status': 'success',
-                'url': upload_to_s3
-            }, status=status.HTTP_201_CREATED)
+            if serializer.data:
+                return Response({
+                    'status': 'success',
+                    'profile_url': serializer.data['profile_pic']
+                }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

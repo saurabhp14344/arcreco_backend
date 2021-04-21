@@ -35,7 +35,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     contact = models.CharField(max_length=12, blank=True, null=True, )
     company_name = models.CharField(max_length=120, null=True)
     last_name = models.CharField(max_length=80, blank=True, null=True, )
-    profile_pic = models.ImageField(blank=True, null=True)
+    profile_pic = models.ImageField(upload_to='images/profile/', blank=True, null=True)
     designation = models.CharField(max_length=120, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
