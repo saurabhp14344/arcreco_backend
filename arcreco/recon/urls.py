@@ -7,7 +7,7 @@ router = DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(r'upload/<int:pk>/', UserUploadFileApiView.as_view(), name='Upload user files'),
+    path(r'upload/', UserUploadFileApiView.as_view(), name='Upload user files'),
     path(r'recon/', MatchFilesApiView.as_view(), name='Match User Files'),
     path(r'filecount/', TotalFilesApiView.as_view()),
     path(r'ageing_report/', AgeingReportApiView.as_view()),

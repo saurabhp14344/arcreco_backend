@@ -86,7 +86,6 @@ class MatchFilesApiView(generics.ListAPIView):
                 emp_d[df_group_name] = json.loads(df_group.to_json(orient='records'))
 
             serializer.create(profile=self.request.user,
-                              # name='test123',
                               name=serializer.validated_data['file1'].split('/')[-1],
                               sales_count=len(file_1_df.index),
                               reconcile_count=csv2.size()['matched'],
@@ -94,8 +93,8 @@ class MatchFilesApiView(generics.ListAPIView):
                               start_date=timestring.Date(start_date),
                               end_date=timestring.Date(end_date)
                               )
-            return Response({'status': 'success', 'data': emp_d, 'total_rows': len(file_1_df.index),
-                             'matched': csv2.size()['matched'], 'unmatched': csv2.size()['unmatched']})
+            return Response({'status': 'success', 'data': emp_d, 'rows_reconciled   ': len(file_1_df.index),
+                             'matched_entries': csv2.size()['matched'], 'unmatched_entries': csv2.size()['unmatched']})
             # csv2.to_csv('filename_here.csv', index=False)
         return Response({'status': 'failed'})
 
@@ -113,6 +112,9 @@ class TotalFilesApiView(APIView):
                    'total_sales': sales['sales_count__sum'],
                    'total_reconcile': reconcile['reconcile_count__sum'],
                    'total_ageing': ageing['ageing_count__sum'],
+                   'rows_reconciled': 0,
+                   'matched_entries': 0,
+                   'unmatched_entries': 0
                    }
         return Response(content)
 

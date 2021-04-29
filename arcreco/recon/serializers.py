@@ -38,6 +38,12 @@ class TotalReconcileSerializer(serializers.ModelSerializer):
                 sales_count=kwargs.get('sales_count'),
                 reconcile_count=kwargs.get('reconcile_count'),
                 ageing_count=kwargs.get('ageing_count'),
+                reconcile_t1=kwargs.get('reconcile_t1'),
+                reconcile_t2=kwargs.get('reconcile_t1'),
+                reconcile_t3=kwargs.get('reconcile_t1'),
+                settlement_amount=kwargs.get('settlement_amount'),
+                bank_amount=kwargs.get('bank_amount'),
+                open_amount=kwargs.get('open_amount'),
                 start_date=str(kwargs.get('start_date')),
                 end_date=str(kwargs.get('end_date'))
             )
