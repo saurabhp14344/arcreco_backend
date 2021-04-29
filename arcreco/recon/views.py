@@ -80,6 +80,8 @@ class MatchFilesApiView(generics.ListAPIView):
                                    inplace=True)
             csv2 = csv2.groupby('Status', as_index=False)
 
+
+
             emp_d = {}
             for df_group_name, df_group in csv2:
                 df_group = df_group.drop(columns=['Status'])
@@ -102,21 +104,106 @@ class MatchFilesApiView(generics.ListAPIView):
 class TotalFilesApiView(APIView):
     """count uploaded documents"""
     permission_classes = (IsAuthenticated,)
+    total_sales = 0
+    total_reconcile = 0
+    total_ageing = 0
 
     def get(self, request, format=None):
         user_count = UploadFiles.objects.filter(user_profile=self.request.user).count()
         sales = TotalReconcile.objects.filter(user_profile=self.request.user).aggregate(Sum('sales_count'))
         reconcile = TotalReconcile.objects.filter(user_profile=self.request.user).aggregate(Sum('reconcile_count'))
         ageing = TotalReconcile.objects.filter(user_profile=self.request.user).aggregate(Sum('ageing_count'))
-        content = {'total_uploaded_files': user_count,
-                   'total_sales': sales['sales_count__sum'],
-                   'total_reconcile': reconcile['reconcile_count__sum'],
-                   'total_ageing': ageing['ageing_count__sum'],
-                   'rows_reconciled': 0,
-                   'matched_entries': 0,
-                   'unmatched_entries': 0
-                   }
-        return Response(content)
+        all_data = {}
+        sub_dict = {}
+        day_dict = {}
+        if sales['sales_count__sum']:
+            self.total_sales = sales['sales_count__sum']
+        if reconcile['reconcile_count__sum']:
+            self.total_reconcile = reconcile['reconcile_count__sum']
+        if ageing['ageing_count__sum']:
+            self.total_ageing = ageing['ageing_count__sum']
+        content = {
+            'total_uploaded_files': user_count,
+            'total_sales': self.total_sales,
+            'total_reconcile': self.total_reconcile,
+            'total_ageing': self.total_ageing,
+            'rows_reconciled': 0,
+            'matched_entries': 0,
+            'unmatched_entries': 0
+        }
+        all_data['dashboard_data'] = content
+        sub_dict['December 2020'] = {
+            'total': 2850250.00,
+            't': 0.00,
+            't+1': 560962.00,
+            't+2': 1256083.00,
+            't+3': 1033205.00
+        }
+        sub_dict['January 2021'] = {
+            'total': 2650250.00,
+            't': 0.00,
+            't+1': 460962.00,
+            't+2': 1156083.00,
+            't+3': 1033205.00
+        }
+        sub_dict['February 2021'] = {
+            'total': 2750250.00,
+            't': 0.00,
+            't+1': 460962.00,
+            't+2': 1156083.00,
+            't+3': 1133205.00
+        }
+        sub_dict['March 2021'] = {
+            'total': 2350250.00,
+            't': 0.00,
+            't+1': 260962.00,
+            't+2': 1056083.00,
+            't+3': 1033205.00
+        }
+        sub_dict['April 2021'] = {
+            'total': 2950250.00,
+            't': 0.00,
+            't+1': 560962.00,
+            't+2': 1356083.00,
+            't+3': 1033205.00
+        }
+        day_dict['November 2020'] = {
+            'Settlement amount': 2450250.00,
+            'bank amount': 2450250.00,
+            'open amount': 260962.00,
+            'outstanding': 0.00,
+        }
+        day_dict['December 2020'] = {
+            'Settlement amount': 2730154.00,
+            'bank amount': 2730154.00,
+            'open amount': 120096.00,
+            'outstanding': 0.00,
+        }
+        day_dict['January 2021'] = {
+            'Settlement amount': 2548155.00,
+            'bank amount': 2650250.00,
+            'open amount': 102095.00,
+            'outstanding': 0.00,
+        }
+        day_dict['February 2021'] = {
+            'Settlement amount': 2459143.00,
+            'bank amount': 2459143.00,
+            'open amount': 291107.00,
+            'outstanding': 0.00,
+        }
+        day_dict['March 2021'] = {
+            'Settlement amount': 2180897.00,
+            'bank amount': 2180897.00,
+            'open amount': 169353.00,
+            'outstanding': 0.00,
+        }
+
+        all_data['time_reconcile'] = sub_dict
+        all_data['day_reconcile'] = day_dict
+        return Response({
+                'status': 'success',
+                'data': all_data
+        })
 
 
 class AgeingReportApiView(APIView):
