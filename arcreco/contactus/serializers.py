@@ -15,5 +15,5 @@ class UserContactUsSerializer(serializers.ModelSerializer):
         def create(self, validated_data):
             """create contactus information"""
 
-            parking_detail = ContactUs.objects.create(**validated_data)
-            return parking_detail
+            contact = ContactUs.objects.create(**validated_data)
+            return contact
