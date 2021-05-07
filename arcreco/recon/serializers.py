@@ -17,12 +17,12 @@ class UserUploadFileSerializer(serializers.ModelSerializer):
 
 
 class TotalReconcileSerializer(serializers.ModelSerializer):
-    file1 = serializers.CharField(max_length=240)
-    file2 = serializers.CharField(max_length=240)
+    file1_id = serializers.CharField(max_length=240)
+    file2_id = serializers.CharField(max_length=240)
 
     class Meta:
         model = TotalReconcile
-        fields = ('name', 'sales_count', 'file1', 'file2',)
+        fields = ('name', 'sales_count', 'file1_id', 'file2_id',)
         extra_kwargs = {
             "name": {"required": False},
             "sales_count": {"required": False},
@@ -52,4 +52,4 @@ class TotalReconcileSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.Serializer):
     """pass file to get generate reports"""
-    file = serializers.CharField(max_length=240, required=True)
+    file_id = serializers.CharField(max_length=240, required=True)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from . import models
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -119,3 +120,12 @@ class CompanyLogoSerializer(serializers.ModelSerializer):
         c_logo = models.UserCompanyLogo(users=instance, logo=validated_data.get('logo'))
         c_logo.save()
         return c_logo
+
+
+class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
+    """adding user information inside dictionary"""
+
+    def validate(self, attrs):
+        r = super(TokenObtainPairPatchedSerializer, self).validate(attrs)
+        r.update({'is_admin': self.user.is_superuser})
+        return r

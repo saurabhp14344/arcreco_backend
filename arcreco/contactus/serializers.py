@@ -11,3 +11,9 @@ class UserContactUsSerializer(serializers.ModelSerializer):
                         'subject': {'required': True},
                         'desc': {'required': True},
                         }
+
+        def create(self, validated_data):
+            """create contactus information"""
+
+            parking_detail = ContactUs.objects.create(**validated_data)
+            return parking_detail
