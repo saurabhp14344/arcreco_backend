@@ -7,7 +7,7 @@ from rest_framework.settings import api_settings
 from rest_framework import status
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-import requests
+from django.db.models import Q
 from .serializers import UserProfileSerializer, UpdateUserProfileSerializer, UpdateUserProfilePictureSerializer, \
     AddNewUserProfileSerializer, ChangePasswordSerializer, CompanyLogoSerializer, TokenObtainPairPatchedSerializer
 from . import s3_upload
@@ -95,8 +95,14 @@ class UserAddAPIView(generics.ListAPIView, generics.CreateAPIView, generics.Upda
     """Add new profile by admin"""
 
     permission_classes = (IsAuthenticated, IsAdminUser,)
-    queryset = UserProfile.objects.all()
     serializer_class = AddNewUserProfileSerializer
+
+    def get_queryset(self):
+        word = self.request.query_params.get('q')
+        queryset = UserProfile.objects.all()
+        if word:
+            queryset = queryset.filter(Q(name__icontains=word) | Q(email__icontains=word))
+        return queryset
 
     def send_email(request, **kwargs):
         email = EmailMessage(

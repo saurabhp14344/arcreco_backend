@@ -12,6 +12,7 @@ import numpy as np
 from core.permissions import UpdateOwnProfile
 import timestring
 import json
+from arcreco import settings
 
 
 class UserUploadFileApiView(generics.CreateAPIView, generics.ListAPIView):
@@ -132,6 +133,9 @@ class TotalFilesApiView(APIView):
     sales = []
     reconcile = []
     ageing = []
+    total_ageing = 0
+    total_reconcile = 0
+    total_sales = 0
 
     def get(self, request, format=None):
         logo = UserCompanyLogo.objects.filter(users=self.request.user)
@@ -148,8 +152,8 @@ class TotalFilesApiView(APIView):
                     'sales_count': sale.sales_count
                 }
                 self.sales.append(data)
-            total_sales = sales.aggregate(Sum('sales_count'))['sales_count__sum']
-            self.sales.append({'total_sales': total_sales})
+            self.total_sales = sales.aggregate(Sum('sales_count'))['sales_count__sum']
+
         if reconcile:
             for recon in reconcile:
                 data = {
@@ -157,8 +161,8 @@ class TotalFilesApiView(APIView):
                     'reconcile_count': recon.reconcile_count
                 }
                 self.reconcile.append(data)
-            total_reconcile = reconcile.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
-            self.reconcile.append({'total_reconcile': total_reconcile})
+            self.total_reconcile = reconcile.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
+
         if ageing:
             for age in ageing:
                 data = {
@@ -166,14 +170,16 @@ class TotalFilesApiView(APIView):
                     'ageing_count': age.ageing_count
                 }
                 self.ageing.append(data)
-            total_ageing = ageing.aggregate(Sum('ageing_count'))['ageing_count__sum']
-            self.ageing.append({'total_ageing': total_ageing})
+            self.total_ageing = ageing.aggregate(Sum('ageing_count'))['ageing_count__sum']
 
         content = {
             'total_uploaded_files': user_count,
-            'total_sales': self.sales,
-            'total_reconcile': self.reconcile,
-            'total_ageing': self.ageing,
+            'sales': self.sales,
+            'total_sales': self.total_sales,
+            'reconcile': self.reconcile,
+            'total_reconcile': self.total_reconcile,
+            'ageing': self.ageing,
+            'total_ageing': self.total_ageing,
             'rows_reconciled': 0,
             'matched_entries': 0,
             'unmatched_entries': 0,
@@ -257,10 +263,9 @@ class TotalFilesApiView(APIView):
             }]
 
         if logo:
-            all_data['company_logo'] = str(logo.last().logo)
+            all_data['company_logo'] = f"http://{request.get_host()}{settings.MEDIA_URL}{str(logo.last().logo)}"
         else:
             all_data['company_logo'] = None
-
         return Response({
             'status': 'success',
             'data': all_data
