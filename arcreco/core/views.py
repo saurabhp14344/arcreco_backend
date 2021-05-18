@@ -69,7 +69,7 @@ class ChangeProfilePictureView(generics.UpdateAPIView):
             if serializer.data:
                 return Response({
                     'status': 'success',
-                    'profile_url': serializer.data['profile_pic']
+                    'profile_url': f"http://{request.get_host()}{serializer.data['profile_pic']}"
                 }, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -201,7 +201,7 @@ class CompanyLogoView(generics.UpdateAPIView):
             if serializer.data:
                 return Response({
                     'status': 'success',
-                    'logo': serializer.data['logo']
+                    'logo': f"http://{request.get_host()}{str(serializer.data['logo'])}"
                 }, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

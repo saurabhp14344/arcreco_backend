@@ -130,9 +130,6 @@ class MatchFilesApiView(generics.ListAPIView):
 class TotalFilesApiView(APIView):
     """count uploaded documents"""
     permission_classes = (IsAuthenticated,)
-    sales = []
-    reconcile = []
-    ageing = []
     total_ageing = 0
     total_reconcile = 0
     total_sales = 0
@@ -144,6 +141,9 @@ class TotalFilesApiView(APIView):
         reconcile = TotalReconcile.objects.filter(user_profile=self.request.user)
         ageing = TotalReconcile.objects.filter(user_profile=self.request.user)
         all_data = {}
+        sale_lst = []
+        reconcile_lst = []
+        ageing_lst = []
 
         if sales:
             for sale in sales:
@@ -151,7 +151,7 @@ class TotalFilesApiView(APIView):
                     'date': sale.start_date.strftime("%B %Y"),
                     'sales_count': sale.sales_count
                 }
-                self.sales.append(data)
+                sale_lst.append(data)
             self.total_sales = sales.aggregate(Sum('sales_count'))['sales_count__sum']
 
         if reconcile:
@@ -160,7 +160,7 @@ class TotalFilesApiView(APIView):
                     'date': recon.start_date.strftime("%B %Y"),
                     'reconcile_count': recon.reconcile_count
                 }
-                self.reconcile.append(data)
+                reconcile_lst.append(data)
             self.total_reconcile = reconcile.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
 
         if ageing:
@@ -169,16 +169,16 @@ class TotalFilesApiView(APIView):
                     'date': age.start_date.strftime("%B %Y"),
                     'ageing_count': age.ageing_count
                 }
-                self.ageing.append(data)
+                ageing_lst.append(data)
             self.total_ageing = ageing.aggregate(Sum('ageing_count'))['ageing_count__sum']
 
         content = {
             'total_uploaded_files': user_count,
-            'sales': self.sales,
+            'sales': sale_lst,
             'total_sales': self.total_sales,
-            'reconcile': self.reconcile,
+            'reconcile': reconcile_lst,
             'total_reconcile': self.total_reconcile,
-            'ageing': self.ageing,
+            'ageing': ageing_lst,
             'total_ageing': self.total_ageing,
             'rows_reconciled': 0,
             'matched_entries': 0,
