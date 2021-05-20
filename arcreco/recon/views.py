@@ -107,9 +107,15 @@ class MatchFilesApiView(generics.ListAPIView):
             csv2 = csv2.groupby('Status', as_index=False)
 
             emp_d = {}
+
+            # df11 = pd.DataFrame({'name': ['User 4', 'User 5']})
+            # print(connection)
+            # df11.to_sql('users_dummy', con=connection, if_exists='append')
+
             for df_group_name, df_group in csv2:
                 df_group = df_group.drop(columns=['Status'])
                 emp_d[df_group_name] = json.loads(df_group.to_json(orient='records'))
+                # df_group.to_sql(name="table1", con=connection, if_exists="append")
             # append partial unmatched
             emp_d['partial_unmatched'] = []
 
@@ -121,7 +127,7 @@ class MatchFilesApiView(generics.ListAPIView):
                               start_date=timestring.Date(start_date),
                               end_date=timestring.Date(end_date)
                               )
-            return Response({'status': 'success', 'data': emp_d, 'rows_reconciled   ': len(file_1_df.index),
+            return Response({'status': 'success', 'data': emp_d, 'rows_reconciled': len(file_1_df.index),
                              'matched_entries': csv2.size()['matched'], 'unmatched_entries': csv2.size()['unmatched']})
             # csv2.to_csv('filename_here.csv', index=False)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -151,7 +157,8 @@ class TotalFilesApiView(APIView):
                     'date': sale.start_date.strftime("%B %Y"),
                     'sales_count': sale.sales_count
                 }
-                sale_lst.append(data)
+                if not any(sale_d['date'] == sale.start_date.strftime("%B %Y") for sale_d in sale_lst):
+                    sale_lst.append(data)
             self.total_sales = sales.aggregate(Sum('sales_count'))['sales_count__sum']
 
         if reconcile:
@@ -160,7 +167,8 @@ class TotalFilesApiView(APIView):
                     'date': recon.start_date.strftime("%B %Y"),
                     'reconcile_count': recon.reconcile_count
                 }
-                reconcile_lst.append(data)
+                if not any(reconcile_d['date'] == recon.start_date.strftime("%B %Y") for reconcile_d in reconcile_lst):
+                    reconcile_lst.append(data)
             self.total_reconcile = reconcile.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
 
         if ageing:
@@ -169,7 +177,8 @@ class TotalFilesApiView(APIView):
                     'date': age.start_date.strftime("%B %Y"),
                     'ageing_count': age.ageing_count
                 }
-                ageing_lst.append(data)
+                if not any(ageing_d['date'] == age.start_date.strftime("%B %Y") for ageing_d in ageing_lst):
+                    ageing_lst.append(data)
             self.total_ageing = ageing.aggregate(Sum('ageing_count'))['ageing_count__sum']
 
         content = {
@@ -186,69 +195,69 @@ class TotalFilesApiView(APIView):
         }
         all_data['dashboard_data'] = content
         all_data['time_reconcile'] = [{
-            'date': 'December 2020',
+            'date': 'August 2020',
             'total': 2850250.00,
             't': 0.00,
-            't+1': 560962.00,
-            't+2': 1256083.00,
-            't+3': 1033205.00
+            't1': 560962.00,
+            't2': 1256083.00,
+            't3': 1033205.00
         },
             {
-                'date': 'December 2020',
+                'date': 'September 2020',
                 'total': 2650250.00,
                 't': 0.00,
-                't+1': 460962.00,
-                't+2': 1156083.00,
-                't+3': 1033205.00
+                't1': 460962.00,
+                't2': 1156083.00,
+                't3': 1033205.00
             },
             {
-                'date': 'December 2020',
+                'date': 'October 2020',
                 'total': 2750250.00,
                 't': 0.00,
-                't+1': 460962.00,
-                't+2': 1156083.00,
-                't+3': 1133205.00
+                't1': 460962.00,
+                't2': 1156083.00,
+                't3': 1133205.00
             },
             {
-                'date': 'December 2020',
+                'date': 'November 2020',
                 'total': 2350250.00,
                 't': 0.00,
-                't+1': 260962.00,
-                't+2': 1056083.00,
-                't+3': 1033205.00
+                't1': 260962.00,
+                't2': 1056083.00,
+                't3': 1033205.00
             },
             {
                 'date': 'December 2020',
                 'total': 2950250.00,
                 't': 0.00,
-                't+1': 560962.00,
-                't+2': 1356083.00,
-                't+3': 1033205.00
+                't1': 560962.00,
+                't2': 1356083.00,
+                't3': 1033205.55
             }]
 
         all_data['day_reconcile'] = [{
-            'date': 'November 2020',
+            'date': 'July 2020',
             'settlement_amount': 2450250.00,
             'bank_amount': 2450250.00,
             'open_amount': 260962.00,
             'outstanding': 0.00,
         },
             {
-                'date': 'November 2020',
+                'date': 'August 2020',
                 'settlement_amount': 2730154.00,
                 'bank_amount': 2730154.00,
                 'open_amount': 120096.00,
                 'outstanding': 0.00,
             },
             {
-                'date': 'November 2020',
+                'date': 'September 2020',
                 'settlement_amount': 2548155.00,
                 'bank_amount': 2650250.00,
                 'open_amount': 102095.00,
                 'outstanding': 0.00,
             },
             {
-                'date': 'November 2020',
+                'date': 'October 2020',
                 'settlement_amount': 2459143.00,
                 'bank_amount': 2459143.00,
                 'open_amount': 291107.00,
@@ -294,7 +303,7 @@ class AgeingReportApiView(APIView):
                 ageing_group = ageing_group.drop(columns=['item_status'])
                 if ageing_group_name == 'COD':
                     data['ageing'] = json.loads(ageing_group.to_json(orient='records'))
-                    data['ageing'].append({'total_order_amount': round(ageing_group['total_amount'].sum(), 2)})
+                    data['total_order_amount'] = round(ageing_group['total_amount'].sum(), 2)
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -321,12 +330,18 @@ class ModePaymentReportApiView(APIView):
             for payment_group_name, payment_group in payment_mode_file:
                 payment_group = payment_group.drop(columns=['payment_method'])
                 data[payment_group_name] = json.loads(payment_group.to_json(orient='records'))
-                data[payment_group_name].append({'total_order_amount': round(payment_group['amount'].sum(), 2)})
-                data[payment_group_name].append(
-                    {'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2)})
-                data[payment_group_name].append({'total_tax_amount': round(payment_group['tax'].sum(), 2)})
-                data[payment_group_name].append({'total_debit_amount': round(payment_group['debit'].sum(), 2)})
-                data[payment_group_name].append({'total_credit_amount': round(payment_group['credit'].sum(), 2)})
+                data[payment_group_name + "_total_amount"] = {
+                    'total_order_amount': round(payment_group['amount'].sum(), 2),
+                    'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2),
+                    'total_tax_amount': round(payment_group['tax'].sum(), 2),
+                    'total_debit_amount': round(payment_group['debit'].sum(), 2),
+                    'total_credit_amount': round(payment_group['credit'].sum(), 2)
+                }
+                # data[payment_group_name].append(
+                #     {'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2)})
+                # data[payment_group_name].append({'total_tax_amount': round(payment_group['tax'].sum(), 2)})
+                # data[payment_group_name].append({'total_debit_amount': round(payment_group['debit'].sum(), 2)})
+                # data[payment_group_name].append({'total_credit_amount': round(payment_group['credit'].sum(), 2)})
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -378,11 +393,16 @@ class ExceptionReportApiView(APIView):
                 exception_group = exception_group.drop(columns=['transaction_entity'])
                 if exception_group_name == 'refund':
                     data['exception'] = json.loads(exception_group.to_json(orient='records'))
-                    data['exception'].append({'total_order_amount': round(exception_group['amount'].sum(), 2)})
-                    data['exception'].append(
-                        {'total_gateway_fee': round(exception_group['fee_tax'].sum(), 2)})
-                    data['exception'].append({'total_tax_amount': round(exception_group['tax'].sum(), 2)})
-                    data['exception'].append({'total_debit_amount': round(exception_group['debit'].sum(), 2)})
+                    data["exception_total_amount"] = {
+                        'total_order_amount': round(exception_group['amount'].sum(), 2),
+                        'total_gateway_fee': round(exception_group['fee_tax'].sum(), 2),
+                        'total_tax_amount': round(exception_group['tax'].sum(), 2),
+                        'total_debit_amount': round(exception_group['debit'].sum(), 2),
+                    }
+                    # data['total_order_amount'] = round(exception_group['amount'].sum(), 2)
+                    # data['total_gateway_fee'] = round(exception_group['fee_tax'].sum(), 2)
+                    # data['total_tax_amount'] = round(exception_group['tax'].sum(), 2)
+                    # data['total_debit_amount'] = round(exception_group['debit'].sum(), 2)
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -409,12 +429,19 @@ class SettlementReportApiView(APIView):
             for settlement_group_name, settlement_group in settlement_file:
                 settlement_group = settlement_group.drop(columns=['settlement_utr'])
                 data[settlement_group_name] = json.loads(settlement_group.to_json(orient='records'))
-                data[settlement_group_name].append({'total_order_amount': round(settlement_group['amount'].sum(), 2)})
-                data[settlement_group_name].append(
-                    {'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2)})
-                data[settlement_group_name].append({'total_tax_amount': round(settlement_group['tax'].sum(), 2)})
-                data[settlement_group_name].append({'total_debit_amount': round(settlement_group['debit'].sum(), 2)})
-                data[settlement_group_name].append({'total_credit_amount': round(settlement_group['credit'].sum(), 2)})
+                data[settlement_group_name + "_total_amount"] = {
+                    'total_order_amount': round(settlement_group['amount'].sum(), 2),
+                    'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2),
+                    'total_tax_amount': round(settlement_group['tax'].sum(), 2),
+                    'total_debit_amount': round(settlement_group['debit'].sum(), 2),
+                    'total_credit_amount': round(settlement_group['credit'].sum(), 2)
+                }
+                # data[settlement_group_name].append({'total_order_amount': round(settlement_group['amount'].sum(), 2)})
+                # data[settlement_group_name].append(
+                #     {'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2)})
+                # data[settlement_group_name].append({'total_tax_amount': round(settlement_group['tax'].sum(), 2)})
+                # data[settlement_group_name].append({'total_debit_amount': round(settlement_group['debit'].sum(), 2)})
+                # data[settlement_group_name].append({'total_credit_amount': round(settlement_group['credit'].sum(), 2)})
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
