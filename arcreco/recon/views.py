@@ -302,8 +302,8 @@ class AgeingReportApiView(APIView):
             for ageing_group_name, ageing_group in file_ageing:
                 ageing_group = ageing_group.drop(columns=['item_status'])
                 if ageing_group_name == 'COD':
-                    data['ageing'] = json.loads(ageing_group.to_json(orient='records'))
-                    data['total_order_amount'] = round(ageing_group['total_amount'].sum(), 2)
+                    data = json.loads(ageing_group.to_json(orient='records'))
+                    # data['total_order_amount'] = round(ageing_group['total_amount'].sum(), 2)
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -330,18 +330,14 @@ class ModePaymentReportApiView(APIView):
             for payment_group_name, payment_group in payment_mode_file:
                 payment_group = payment_group.drop(columns=['payment_method'])
                 data[payment_group_name] = json.loads(payment_group.to_json(orient='records'))
-                data[payment_group_name + "_total_amount"] = {
-                    'total_order_amount': round(payment_group['amount'].sum(), 2),
-                    'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2),
-                    'total_tax_amount': round(payment_group['tax'].sum(), 2),
-                    'total_debit_amount': round(payment_group['debit'].sum(), 2),
-                    'total_credit_amount': round(payment_group['credit'].sum(), 2)
-                }
-                # data[payment_group_name].append(
-                #     {'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2)})
-                # data[payment_group_name].append({'total_tax_amount': round(payment_group['tax'].sum(), 2)})
-                # data[payment_group_name].append({'total_debit_amount': round(payment_group['debit'].sum(), 2)})
-                # data[payment_group_name].append({'total_credit_amount': round(payment_group['credit'].sum(), 2)})
+                # data[payment_group_name + "_total_amount"] = {
+                #     'total_order_amount': round(payment_group['amount'].sum(), 2),
+                #     'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2),
+                #     'total_tax_amount': round(payment_group['tax'].sum(), 2),
+                #     'total_debit_amount': round(payment_group['debit'].sum(), 2),
+                #     'total_credit_amount': round(payment_group['credit'].sum(), 2)
+                # }
+
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -392,17 +388,13 @@ class ExceptionReportApiView(APIView):
             for exception_group_name, exception_group in exception_file:
                 exception_group = exception_group.drop(columns=['transaction_entity'])
                 if exception_group_name == 'refund':
-                    data['exception'] = json.loads(exception_group.to_json(orient='records'))
-                    data["exception_total_amount"] = {
-                        'total_order_amount': round(exception_group['amount'].sum(), 2),
-                        'total_gateway_fee': round(exception_group['fee_tax'].sum(), 2),
-                        'total_tax_amount': round(exception_group['tax'].sum(), 2),
-                        'total_debit_amount': round(exception_group['debit'].sum(), 2),
-                    }
-                    # data['total_order_amount'] = round(exception_group['amount'].sum(), 2)
-                    # data['total_gateway_fee'] = round(exception_group['fee_tax'].sum(), 2)
-                    # data['total_tax_amount'] = round(exception_group['tax'].sum(), 2)
-                    # data['total_debit_amount'] = round(exception_group['debit'].sum(), 2)
+                    data = json.loads(exception_group.to_json(orient='records'))
+                    # data["exception_total_amount"] = {
+                    #     'total_order_amount': round(exception_group['amount'].sum(), 2),
+                    #     'total_gateway_fee': round(exception_group['fee_tax'].sum(), 2),
+                    #     'total_tax_amount': round(exception_group['tax'].sum(), 2),
+                    #     'total_debit_amount': round(exception_group['debit'].sum(), 2),
+                    # }
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -428,20 +420,14 @@ class SettlementReportApiView(APIView):
             data = {}
             for settlement_group_name, settlement_group in settlement_file:
                 settlement_group = settlement_group.drop(columns=['settlement_utr'])
-                data[settlement_group_name] = json.loads(settlement_group.to_json(orient='records'))
-                data[settlement_group_name + "_total_amount"] = {
-                    'total_order_amount': round(settlement_group['amount'].sum(), 2),
-                    'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2),
-                    'total_tax_amount': round(settlement_group['tax'].sum(), 2),
-                    'total_debit_amount': round(settlement_group['debit'].sum(), 2),
-                    'total_credit_amount': round(settlement_group['credit'].sum(), 2)
-                }
-                # data[settlement_group_name].append({'total_order_amount': round(settlement_group['amount'].sum(), 2)})
-                # data[settlement_group_name].append(
-                #     {'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2)})
-                # data[settlement_group_name].append({'total_tax_amount': round(settlement_group['tax'].sum(), 2)})
-                # data[settlement_group_name].append({'total_debit_amount': round(settlement_group['debit'].sum(), 2)})
-                # data[settlement_group_name].append({'total_credit_amount': round(settlement_group['credit'].sum(), 2)})
+                data = json.loads(settlement_group.to_json(orient='records'))
+                # data[settlement_group_name + "_total_amount"] = {
+                #     'total_order_amount': round(settlement_group['amount'].sum(), 2),
+                #     'total_gateway_fee': round(settlement_group['fee_tax'].sum(), 2),
+                #     'total_tax_amount': round(settlement_group['tax'].sum(), 2),
+                #     'total_debit_amount': round(settlement_group['debit'].sum(), 2),
+                #     'total_credit_amount': round(settlement_group['credit'].sum(), 2)
+                # }
             if data:
                 return Response({'status': 'success', 'data': data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
