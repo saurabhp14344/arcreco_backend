@@ -10,6 +10,7 @@ class UploadFiles(models.Model):
     name = models.CharField(max_length=60, blank=True, null=True)
     file = models.FileField(blank=True, null=True)
     type = models.CharField(max_length=60, blank=True, null=True)
+    document = models.CharField(max_length=60, blank=True, null=True)
     created_date = models.DateTimeField(default=now, editable=False)
 
     def __str__(self):

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserUploadFileApiView, MatchFilesApiView, TotalFilesApiView, AgeingReportApiView, ModePaymentReportApiView, SalesReportApiView, ExceptionReportApiView, SettlementReportApiView, TimeSettlementReport
+from .views import UserUploadFileApiView, MatchFilesApiView, TotalFilesApiView, AgeingReportApiView, ModePaymentReportApiView, SalesReportApiView, ExceptionReportApiView, SettlementReportApiView, TimeSettlementReport, GenerateReportDashboard
 
 router = DefaultRouter()
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path(r'exception_report/', ExceptionReportApiView.as_view()),
     path(r'settlement_report/', SettlementReportApiView.as_view()),
     path(r'time_settlement_report/', TimeSettlementReport.as_view()),
+    path(r'generate_report_dashboard/', GenerateReportDashboard.as_view()),
 ]

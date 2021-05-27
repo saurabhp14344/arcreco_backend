@@ -13,6 +13,7 @@ from core.permissions import UpdateOwnProfile
 import timestring
 import json
 from arcreco import settings
+from .report_response_static import response_data
 
 
 class UserUploadFileApiView(generics.CreateAPIView, generics.ListAPIView):
@@ -33,10 +34,14 @@ class UserUploadFileApiView(generics.CreateAPIView, generics.ListAPIView):
             flag = 1
             arr = []
             for key, value in zip(types, files):
+                df = pd.read_excel(value, engine='openpyxl')
                 file_name = value.name.split('.')[0]
                 file_serializer = self.serializer_class(data={'name': file_name, 'type': key, 'file': value})
                 if file_serializer.is_valid():
-                    file_serializer.save(user_profile=self.request.user)
+                    if 'settlement_id' in df:
+                        file_serializer.save(user_profile=self.request.user, document='SED')
+                    else:
+                        file_serializer.save(user_profile=self.request.user, document='PRD')
                     arr.append(file_serializer.data)
                 else:
                     flag = 0
@@ -236,6 +241,7 @@ class TotalFilesApiView(APIView):
             }]
 
         all_data['day_reconcile'] = [{
+            'id': 1,
             'date': 'July 2020',
             'settlement_amount': 2450250.00,
             'bank_amount': 2450250.00,
@@ -243,6 +249,7 @@ class TotalFilesApiView(APIView):
             'outstanding': 0.00,
         },
             {
+                'id': 2,
                 'date': 'August 2020',
                 'settlement_amount': 2730154.00,
                 'bank_amount': 2730154.00,
@@ -250,6 +257,7 @@ class TotalFilesApiView(APIView):
                 'outstanding': 0.00,
             },
             {
+                'id': 3,
                 'date': 'September 2020',
                 'settlement_amount': 2548155.00,
                 'bank_amount': 2650250.00,
@@ -257,6 +265,7 @@ class TotalFilesApiView(APIView):
                 'outstanding': 0.00,
             },
             {
+                'id': 4,
                 'date': 'October 2020',
                 'settlement_amount': 2459143.00,
                 'bank_amount': 2459143.00,
@@ -264,6 +273,7 @@ class TotalFilesApiView(APIView):
                 'outstanding': 0.00,
             },
             {
+                'id': 5,
                 'date': 'November 2020',
                 'settlement_amount': 2180897.00,
                 'bank_amount': 2180897.00,
@@ -453,3 +463,17 @@ class TimeSettlementReport(APIView):
         return Response({'status': 'success',
                          'data': {'year': 2020, 'month': 'August', 'total_amount': 120015, 'T': 100, 'T+1': 200,
                                   'T+2': 850, 'T+3': 50}})
+
+
+class GenerateReportDashboard(APIView):
+    """generate report"""
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """return response data"""
+        if 'id' in request.query_params:
+            request_id = request.query_params['id']
+            data = response_data(request_id)
+            return Response({'status': 'success', 'data': data})
+        else:
+            return Response({'status': 'failed', 'msg': 'No report id in params'})
