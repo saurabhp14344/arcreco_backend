@@ -148,43 +148,43 @@ class TotalFilesApiView(APIView):
     def get(self, request, format=None):
         logo = UserCompanyLogo.objects.filter(users=self.request.user)
         user_count = UploadFiles.objects.filter(user_profile=self.request.user).count()
-        sales = TotalReconcile.objects.filter(user_profile=self.request.user)
-        reconcile = TotalReconcile.objects.filter(user_profile=self.request.user)
-        ageing = TotalReconcile.objects.filter(user_profile=self.request.user)
+        data_rows = TotalReconcile.objects.filter(user_profile=self.request.user)
+        # reconcile = TotalReconcile.objects.filter(user_profile=self.request.user)
+        # ageing = TotalReconcile.objects.filter(user_profile=self.request.user)
         all_data = {}
         sale_lst = []
         reconcile_lst = []
         ageing_lst = []
 
-        if sales:
-            for sale in sales:
+        if data_rows:
+            for sale in data_rows:
                 data = {
                     'date': sale.start_date.strftime("%B %Y"),
                     'sales_count': sale.sales_count
                 }
                 if not any(sale_d['date'] == sale.start_date.strftime("%B %Y") for sale_d in sale_lst):
                     sale_lst.append(data)
-            self.total_sales = sales.aggregate(Sum('sales_count'))['sales_count__sum']
+            self.total_sales = data_rows.aggregate(Sum('sales_count'))['sales_count__sum']
 
-        if reconcile:
-            for recon in reconcile:
+            # iterate for recon
+            for recon in data_rows:
                 data = {
                     'date': recon.start_date.strftime("%B %Y"),
                     'reconcile_count': recon.reconcile_count
                 }
                 if not any(reconcile_d['date'] == recon.start_date.strftime("%B %Y") for reconcile_d in reconcile_lst):
                     reconcile_lst.append(data)
-            self.total_reconcile = reconcile.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
+            self.total_reconcile = data_rows.aggregate(Sum('reconcile_count'))['reconcile_count__sum']
 
-        if ageing:
-            for age in ageing:
+            # iterate for aging
+            for age in data_rows:
                 data = {
                     'date': age.start_date.strftime("%B %Y"),
                     'ageing_count': age.ageing_count
                 }
                 if not any(ageing_d['date'] == age.start_date.strftime("%B %Y") for ageing_d in ageing_lst):
                     ageing_lst.append(data)
-            self.total_ageing = ageing.aggregate(Sum('ageing_count'))['ageing_count__sum']
+            self.total_ageing = data_rows.aggregate(Sum('ageing_count'))['ageing_count__sum']
 
         content = {
             'total_uploaded_files': user_count,
@@ -335,11 +335,13 @@ class ModePaymentReportApiView(APIView):
                  'entity_created_at', 'order_id']].copy()
             payment = payment_mode.rename(
                 columns={'fee (exclusive tax)': 'fee_tax'})
-            payment_mode_file = payment.groupby('payment_method')
-            data = {}
-            for payment_group_name, payment_group in payment_mode_file:
-                payment_group = payment_group.drop(columns=['payment_method'])
-                data[payment_group_name] = json.loads(payment_group.to_json(orient='records'))
+            data = json.loads(payment.to_json(orient='records'))
+            # print(payment)
+            # payment_mode_file = payment.groupby('payment_method')
+            # data = {}
+            # for payment_group_name, payment_group in payment_mode_file:
+            #     payment_group = payment_group.drop(columns=['payment_method'])
+            #     data[payment_group_name] = json.loads(payment_group.to_json(orient='records'))
                 # data[payment_group_name + "_total_amount"] = {
                 #     'total_order_amount': round(payment_group['amount'].sum(), 2),
                 #     'total_gateway_fee': round(payment_group['fee_tax'].sum(), 2),

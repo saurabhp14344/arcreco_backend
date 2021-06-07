@@ -29,7 +29,7 @@ class TotalReconcileSerializer(serializers.ModelSerializer):
         }
 
     def create(self, **kwargs):
-        if TotalReconcile.objects.filter(name__contains=kwargs.get('name')):
+        if TotalReconcile.objects.filter(Q(start_date__contains=kwargs.get('start_date')) & Q(user_profile_id=kwargs.get('profile'))):
             pass
         else:
             obj = TotalReconcile.objects.create(
